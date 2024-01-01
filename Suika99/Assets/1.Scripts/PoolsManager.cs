@@ -104,6 +104,7 @@ public class PoolsManager : MonoBehaviour
     {
         yield return new WaitForSeconds(1f);
         drop = next;
+        drop.position = dropPoint.position;
 
         int rand = Random.Range(0, 3);
         next = fruitPools[rand].pool.Get().transform;
