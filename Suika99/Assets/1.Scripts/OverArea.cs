@@ -15,13 +15,13 @@ public class OverArea : MonoBehaviour
         }
         else
         {
-            overTime -= Time.deltaTime;
-            overTime = overTime < 0f ? 0f : overTime;
+            overTime = 0f;
         }
 
         if (overTime >= 10f)
         {
             GameManager.Instance.IsEnd = true;
+            enabled = false;
         }
     }
 
@@ -38,6 +38,10 @@ public class OverArea : MonoBehaviour
         if (collision.CompareTag("Fruits"))
         {
             enterCount--;
+            if (enterCount < 0)
+            {
+                enterCount = 0;
+            }
         }
     }
 }

@@ -33,8 +33,6 @@ public class RoomData : MonoBehaviour
     private void OnEnterRoom(string roomName)
     {
         PhotonManager.Instance.SetUserName();
-
-        RoomOptions room = new() { MaxPlayers = 10, IsOpen = true, IsVisible = true };
-        PhotonNetwork.JoinOrCreateRoom(roomName, room, TypedLobby.Default);
+        PhotonNetwork.JoinRoom(roomName);
     }
 }

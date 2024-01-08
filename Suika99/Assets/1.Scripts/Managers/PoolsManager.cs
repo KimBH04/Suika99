@@ -9,7 +9,8 @@ public class PoolsManager : MonoBehaviour
 {
     public static PoolsManager Instance { get; private set; }
 
-    public Transform dropPoint;
+    [SerializeField] private Transform Basket;
+    [SerializeField] private Transform dropPoint;
     [SerializeField] private Transform nextPoint;
     [SerializeField] private Transform holdPoint;
 
@@ -71,6 +72,8 @@ public class PoolsManager : MonoBehaviour
         rigid2d.constraints = RigidbodyConstraints2D.None;
         circle.enabled = true;
 
+        drop.parent = Basket;
+
         drop = null;
         StartCoroutine(DropChange());
     }
@@ -102,7 +105,7 @@ public class PoolsManager : MonoBehaviour
 
     private IEnumerator DropChange()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
         drop = next;
         drop.position = dropPoint.position;
 

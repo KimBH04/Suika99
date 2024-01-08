@@ -4,17 +4,18 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class PhotonManager : MonoBehaviourPunCallbacks
 {
-    public static PhotonManager Instance;
+    public static PhotonManager Instance { get; private set; }
 
     private readonly string version = "1.0";
 
     [Header("Name Fields")]
     [SerializeField] private TMP_InputField nickNameField;
     [SerializeField] private TMP_InputField roomNameField;
+    [SerializeField] private GameObject joinButton;
+    [SerializeField] private GameObject createButton;
 
     [Header("Rooms List")]
     [SerializeField] private GameObject roomItemPrefab;
@@ -37,8 +38,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     {
         SetUserName();
 
-        string roomName = string.IsNullOrWhiteSpace(roomNameField.text) ? $"Bascket_{Random.Range(1, 100)}" : roomNameField.text;
-        RoomOptions room = new() { MaxPlayers = 10, IsOpen = true, IsVisible = true };
+        string roomName = string.IsNullOrWhiteSpace(roomNameField.text) ? $"Basket_{Random.Range(1, 100)}" : roomNameField.text;
+        RoomOptions room = new() { MaxPlayers = 9, IsOpen = true, IsVisible = true };
         PhotonNetwork.JoinOrCreateRoom(roomName, room, TypedLobby.Default);
     }
 
@@ -58,11 +59,19 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public override void OnJoinedLobby()
     {
         Debug.Log("Joined Lobby");
+
+        joinButton.SetActive(true);
+        createButton.SetActive(true);
     }
 
     public override void OnCreatedRoom()
     {
         Debug.Log("Created Room!");
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LoadLevel(2);
+        }
     }
 
     public override void OnCreateRoomFailed(short returnCode, string message)
@@ -82,8 +91,6 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, roomList.Count * 110 + 10);
-
         foreach (var room in roomList)
         {
             if (room.RemovedFromList)
@@ -112,6 +119,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
                 }
             }
         }
+
+        content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rooms.Count * 110 + 10);
     }
     #endregion
 }

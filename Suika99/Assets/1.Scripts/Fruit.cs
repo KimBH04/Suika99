@@ -1,3 +1,4 @@
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -6,7 +7,7 @@ public class Fruit : MonoBehaviour
     private static uint instanceID;
     private uint id;
 
-    public IObjectPool<GameObject> pool;
+    public ObjectPool<GameObject> pool;
 
     [SerializeField] private FruitType type;
 
@@ -53,7 +54,7 @@ public class Fruit : MonoBehaviour
         }
     }
 
-    public enum FruitType
+    private enum FruitType
     {
         Cherry,
         Strawberry,

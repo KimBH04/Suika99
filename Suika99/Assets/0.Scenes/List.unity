@@ -1522,6 +1522,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nickNameField: {fileID: 1672503853}
   roomNameField: {fileID: 2068674591}
+  joinButton: {fileID: 1448968339}
+  createButton: {fileID: 2128240378}
   roomItemPrefab: {fileID: 3975338967609827288, guid: 6726eea45cdaad24dbc5d0d8c1a1aa5d, type: 3}
   content: {fileID: 2097363336}
 --- !u!4 &1211907059
@@ -1907,7 +1909,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1448968340
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2606,7 +2608,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 476945095}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9999987
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3047,7 +3049,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.0001252129}
+  m_AnchoredPosition: {x: 0, y: 0.00009416105}
   m_SizeDelta: {x: 0, y: 10}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2097363337
@@ -3092,7 +3094,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2128240379
 RectTransform:
   m_ObjectHideFlags: 0

@@ -5,7 +5,7 @@ public class FruitPool : MonoBehaviour
 {
     [SerializeField] private GameObject fruit;
 
-    public IObjectPool<GameObject> pool;
+    public ObjectPool<GameObject> pool;
 
     private void Awake()
     {
