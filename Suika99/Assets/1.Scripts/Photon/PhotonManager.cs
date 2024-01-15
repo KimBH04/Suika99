@@ -28,8 +28,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
         PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.GameVersion = version;
-
-        Debug.Log(PhotonNetwork.SendRate);
+        PhotonNetwork.SerializationRate = 2;
 
         PhotonNetwork.ConnectUsingSettings();
     }
@@ -52,22 +51,17 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     #region Photon
     public override void OnConnectedToMaster()
     {
-        Debug.Log("Connected to Master!");
         PhotonNetwork.JoinLobby();
     }
 
     public override void OnJoinedLobby()
     {
-        Debug.Log("Joined Lobby");
-
         joinButton.SetActive(true);
         createButton.SetActive(true);
     }
 
     public override void OnCreatedRoom()
     {
-        Debug.Log("Created Room!");
-
         if (PhotonNetwork.IsMasterClient)
         {
             PhotonNetwork.LoadLevel(2);
@@ -76,17 +70,17 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
-        Debug.Log($"Failed Creating Room {returnCode}: {message}");
+
     }
 
     public override void OnJoinedRoom()
     {
-        Debug.Log($"Joined Room!");
+
     }
 
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
-        Debug.Log($"Failed Joining Room {returnCode}: {message}");
+
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)

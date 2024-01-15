@@ -6,7 +6,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 
-public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
+public class GameManager : MonoBehaviourPunCallbacks
 {
     public static GameManager Instance { get; private set; }
 
@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private Room room;
 
-    public Dictionary<string, int> playerIndexes = new();
+    private Dictionary<string, int> playerIndexes = new();
     private int userIndex;
 
     private bool isEnd;
@@ -59,6 +59,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    public Transform GetBasket(string nickName)
+    {
+        int index = playerIndexes[nickName];
+        GameObject basket = anotherBaskets[index];
+        return basket.transform;
+    }
+
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         int newPlayersIndex = room.PlayerCount - 2;
@@ -81,7 +88,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 int index = --playerIndexes[nickName];
                 playerNames[index].text = nickName;
             }
-            Debug.Log($"{nickName} {playerIndexes[nickName]}");
         }
 
         if (userIndex > playerIndexes[otherPlayer.NickName])
@@ -90,10 +96,5 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
 
         playerIndexes.Remove(otherPlayer.NickName);
-    }
-
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-
     }
 }

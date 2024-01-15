@@ -1,3 +1,4 @@
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -9,24 +10,24 @@ public class FruitPool : MonoBehaviour
 
     private void Awake()
     {
-        pool = new ObjectPool<GameObject>(CreatePoolItem, TakePoolItem, ReleasePoolItem, DestroyPoolItem, true);
+        pool = new ObjectPool<GameObject>(CreatePoolItem, TakePoolItem, ReleasePoolItem, DestroyPoolItem, true, 255);
     }
 
     private GameObject CreatePoolItem()
     {
-        GameObject poolItem = Instantiate(fruit);
+        GameObject poolItem = PhotonNetwork.Instantiate($"Fruits/{fruit.name}", Vector3.zero, Quaternion.identity);
         poolItem.GetComponent<Fruit>().pool = pool;
         return poolItem;
     }
 
     private void TakePoolItem(GameObject item)
     {
-        item.SetActive(true);
+        item.GetComponent<Fruit>().SetActive(true);
     }
 
     private void ReleasePoolItem(GameObject item)
     {
-        item.SetActive(false);
+        item.GetComponent<Fruit>().SetActive(false);
     }
 
     private void DestroyPoolItem(GameObject item)

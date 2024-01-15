@@ -9,7 +9,6 @@ public class PoolsManager : MonoBehaviour
 {
     public static PoolsManager Instance { get; private set; }
 
-    [SerializeField] private Transform Basket;
     [SerializeField] private Transform dropPoint;
     [SerializeField] private Transform nextPoint;
     [SerializeField] private Transform holdPoint;
@@ -32,10 +31,12 @@ public class PoolsManager : MonoBehaviour
         GetComponentsInChildren(fruitPools);
     }
 
-    private void Start()
+    private IEnumerator Start()
     {
         int rand1 = Random.Range(0, 3);
         int rand2 = Random.Range(0, 3);
+
+        yield return new WaitForSeconds(1f);
 
         drop = fruitPools[rand1].pool.Get().transform;
         drop.position = dropPoint.position;
@@ -71,8 +72,6 @@ public class PoolsManager : MonoBehaviour
 
         rigid2d.constraints = RigidbodyConstraints2D.None;
         circle.enabled = true;
-
-        drop.parent = Basket;
 
         drop = null;
         StartCoroutine(DropChange());

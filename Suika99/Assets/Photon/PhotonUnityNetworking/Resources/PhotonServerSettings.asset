@@ -40,6 +40,8 @@ MonoBehaviour:
   - Fire
   - RespawnSpaceship
   - LeftPlayer
+  - <SetActive>g__Active|13_0
+  - Active
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
