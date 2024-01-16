@@ -9,7 +9,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 {
     public static PhotonManager Instance { get; private set; }
 
-    private readonly string version = "1.0";
+    private readonly string version = "MintChoco";
 
     [Header("Name Fields")]
     [SerializeField] private TMP_InputField nickNameField;
@@ -20,7 +20,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     [Header("Rooms List")]
     [SerializeField] private GameObject roomItemPrefab;
     [SerializeField] private RectTransform content;
-    private Dictionary<string, GameObject> rooms = new();
+    private readonly Dictionary<string, GameObject> rooms = new();
 
     private void Awake()
     {

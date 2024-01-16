@@ -849,10 +849,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18b702e75128c5e48987a2868969fa65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Basket: {fileID: 536622045}
   dropPoint: {fileID: 1559703442}
   nextPoint: {fileID: 1487982411}
-  holdPoint: {fileID: 1235785974}
   moveSpeed: 4
   maxPos: 2.3
   fruitPools: []

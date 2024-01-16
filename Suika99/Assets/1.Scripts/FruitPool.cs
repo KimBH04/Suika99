@@ -22,12 +22,12 @@ public class FruitPool : MonoBehaviour
 
     private void TakePoolItem(GameObject item)
     {
-        item.GetComponent<Fruit>().SetActive(true);
+        item.SetActive(true);
     }
 
     private void ReleasePoolItem(GameObject item)
     {
-        item.GetComponent<Fruit>().SetActive(false);
+        item.GetComponent<Fruit>().PunSetActive(false);
     }
 
     private void DestroyPoolItem(GameObject item)

@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private Room room;
 
-    private Dictionary<string, int> playerIndexes = new();
+    private readonly Dictionary<Player, int> playerIndexes = new();
     private int userIndex;
 
     private bool isEnd;
@@ -47,21 +47,21 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
 
         int index = 0;
-        foreach (var nickName in room.Players.OrderBy(x => x.Key).Select(x => x.Value.NickName))
+        foreach (var player in room.Players.OrderBy(x => x.Key).Select(x => x.Value))
         {
-            if (nickName != PhotonNetwork.NickName)
+            if (player.NickName != PhotonNetwork.NickName)
             {
-                playerNames[index].text = nickName;
+                playerNames[index].text = player.NickName;
                 playerNames[index].gameObject.SetActive(true);
 
-                playerIndexes.Add(nickName, index++);
+                playerIndexes.Add(player, index++);
             }
         }
     }
 
-    public Transform GetBasket(string nickName)
+    public Transform GetBasket(Player player)
     {
-        int index = playerIndexes[nickName];
+        int index = playerIndexes[player];
         GameObject basket = anotherBaskets[index];
         return basket.transform;
     }
@@ -69,7 +69,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         int newPlayersIndex = room.PlayerCount - 2;
-        playerIndexes.Add(newPlayer.NickName, newPlayersIndex);
+        playerIndexes.Add(newPlayer, newPlayersIndex);
 
         playerNames[newPlayersIndex].text = newPlayer.NickName;
         anotherBaskets[newPlayersIndex].SetActive(true);
@@ -81,20 +81,20 @@ public class GameManager : MonoBehaviourPunCallbacks
         anotherBaskets[room.PlayerCount - 1].SetActive(false);
         playerNames[room.PlayerCount - 1].gameObject.SetActive(false);
 
-        foreach (var nickName in playerIndexes.Keys.ToArray())
+        foreach (var player in playerIndexes.Keys.ToArray())
         {
-            if (playerIndexes[nickName] > playerIndexes[otherPlayer.NickName])
+            if (playerIndexes[player] > playerIndexes[otherPlayer])
             {
-                int index = --playerIndexes[nickName];
-                playerNames[index].text = nickName;
+                int index = --playerIndexes[player];
+                playerNames[index].text = player.NickName;
             }
         }
 
-        if (userIndex > playerIndexes[otherPlayer.NickName])
+        if (userIndex > playerIndexes[otherPlayer])
         {
             userIndex--;
         }
 
-        playerIndexes.Remove(otherPlayer.NickName);
+        playerIndexes.Remove(otherPlayer);
     }
 }

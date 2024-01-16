@@ -11,12 +11,9 @@ public class PoolsManager : MonoBehaviour
 
     [SerializeField] private Transform dropPoint;
     [SerializeField] private Transform nextPoint;
-    [SerializeField] private Transform holdPoint;
 
     private Transform drop;
     private Transform next;
-    private Transform hold;
-    private bool isChanged;
 
     [SerializeField] private float moveSpeed;
     [SerializeField] private float maxPos;
@@ -67,39 +64,12 @@ public class PoolsManager : MonoBehaviour
             return;
         }
 
-        Rigidbody2D rigid2d = drop.GetComponent<Rigidbody2D>();
-        CircleCollider2D circle = drop.GetComponent<CircleCollider2D>();
-
-        rigid2d.constraints = RigidbodyConstraints2D.None;
-        circle.enabled = true;
+        drop.GetComponent<Fruit>().PunSetActive(true);
+        drop.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
+        drop.GetComponent<CircleCollider2D>().enabled = true;
 
         drop = null;
         StartCoroutine(DropChange());
-    }
-
-    private void OnHold()
-    {
-        if (isChanged || drop == null)
-        {
-            return;
-        }
-
-        if (hold == null)
-        {
-            hold = drop;
-            drop = next;
-
-            int rand = Random.Range(0, 3);
-            next = fruitPools[rand].pool.Get().transform;
-            next.position = nextPoint.position;
-        }
-        else
-        {
-            (drop, hold) = (hold, drop);
-        }
-
-        hold.position = holdPoint.position;
-        isChanged = true;
     }
 
     private IEnumerator DropChange()
@@ -113,7 +83,5 @@ public class PoolsManager : MonoBehaviour
         next.position = nextPoint.position;
 
         dropPoint.localPosition = Vector3.zero;
-
-        isChanged = false;
     }
 }
