@@ -28,12 +28,10 @@ public class PoolsManager : MonoBehaviour
         GetComponentsInChildren(fruitPools);
     }
 
-    private IEnumerator Start()
+    private void Start()
     {
         int rand1 = Random.Range(0, 3);
         int rand2 = Random.Range(0, 3);
-
-        yield return new WaitForSeconds(1f);
 
         drop = fruitPools[rand1].pool.Get().transform;
         drop.position = dropPoint.position;

@@ -1,3 +1,4 @@
+using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
@@ -10,17 +11,43 @@ public class GameManager : MonoBehaviourPunCallbacks
 {
     public static GameManager Instance { get; private set; }
 
+    private static Room room;
+
     [SerializeField] private GameObject[] anotherBaskets;
+    [SerializeField] private GameObject[] KOPanels;
     [SerializeField] private TMP_Text[] playerNames;
 
-    private Room room;
+    [SerializeField] private GameObject startButton;
+    [SerializeField] private TMP_Text countDownText;
+
+    [SerializeField] private GameObject pools;
 
     private readonly Dictionary<Player, int> playerIndexes = new();
     private int userIndex;
 
-    private bool isEnd;
+    private readonly RaiseEventOptions options = new()
+    {
+        CachingOption = EventCaching.DoNotCache,
+        Receivers = ReceiverGroup.All,
+    };
 
-    public bool IsEnd
+    private static bool isStart;
+    private static bool isEnd;
+
+    public static bool IsStart
+    {
+        get
+        {
+            return isStart;
+        }
+        set
+        {
+            room.IsVisible = value;
+            isStart = value;
+        }
+    }
+
+    public static bool IsEnd
     {
         get
         {
@@ -29,6 +56,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         set
         {
             isEnd = value;
+            PhotonNetwork.RaiseEvent(1, PhotonNetwork.LocalPlayer, Instance.options, SendOptions.SendReliable);
         }
     }
 
@@ -57,13 +85,78 @@ public class GameManager : MonoBehaviourPunCallbacks
                 playerIndexes.Add(player, index++);
             }
         }
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            startButton.SetActive(true);
+        }
+
+        PhotonNetwork.NetworkingClient.EventReceived += OnEvent;
     }
 
-    public Transform GetBasket(Player player)
+    public void StartGame()
     {
-        int index = playerIndexes[player];
-        GameObject basket = anotherBaskets[index];
-        return basket.transform;
+        if (room.PlayerCount == 1)
+        {
+            //Display warning text
+            Debug.LogWarning("No one came to this room!");
+            return;
+        }
+
+        PhotonNetwork.RaiseEvent(0, null, options, SendOptions.SendReliable);
+    }
+
+    private void OnEvent(EventData data)
+    {
+        byte eventCode = data.Code;
+        switch (eventCode)
+        {
+            case 0:
+                IsStart = true;
+                startButton.SetActive(false);
+
+                StartCoroutine(CountDown());
+                countDownText.gameObject.SetActive(true);
+                break;
+
+            case 1:
+                Player endedPlayer = (Player)data.CustomData;
+                if (endedPlayer != PhotonNetwork.LocalPlayer)
+                {
+                    int index = playerIndexes[endedPlayer];
+                    KOPanels[index].SetActive(true);
+                }
+                else
+                {
+                    KOPanels[^1].SetActive(true);
+                }
+
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    PhotonNetwork.DestroyPlayerObjects(endedPlayer);
+                }
+                break;
+
+            default:
+                if (eventCode < 200)
+                {
+                    Debug.LogWarning($"Recieved unknown event code! : {{{eventCode}}}");
+                }
+                break;
+        }
+    }
+
+    private IEnumerator CountDown()
+    {
+        int count = 3;
+        while (count > 0)
+        {
+            countDownText.text = count--.ToString();
+            yield return new WaitForSeconds(1);
+        }
+
+        countDownText.gameObject.SetActive(false);
+        pools.SetActive(true);
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
@@ -78,23 +171,43 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        anotherBaskets[room.PlayerCount - 1].SetActive(false);
-        playerNames[room.PlayerCount - 1].gameObject.SetActive(false);
-
-        foreach (var player in playerIndexes.Keys.ToArray())
+        if (isStart)
         {
-            if (playerIndexes[player] > playerIndexes[otherPlayer])
+            int index = playerIndexes[otherPlayer];
+            KOPanels[index].SetActive(true);
+        }
+        else
+        {
+            anotherBaskets[room.PlayerCount - 1].SetActive(false);
+            playerNames[room.PlayerCount - 1].gameObject.SetActive(false);
+
+            foreach (var player in playerIndexes.Keys.ToArray())
             {
-                int index = --playerIndexes[player];
-                playerNames[index].text = player.NickName;
+                if (playerIndexes[player] > playerIndexes[otherPlayer])
+                {
+                    int index = --playerIndexes[player];
+                    playerNames[index].text = player.NickName;
+                }
+            }
+
+            if (userIndex > playerIndexes[otherPlayer])
+            {
+                userIndex--;
+            }
+
+            playerIndexes.Remove(otherPlayer);
+
+            if (PhotonNetwork.IsMasterClient)
+            {
+                startButton.SetActive(true);
             }
         }
+    }
 
-        if (userIndex > playerIndexes[otherPlayer])
-        {
-            userIndex--;
-        }
-
-        playerIndexes.Remove(otherPlayer);
+    public Transform GetBasket(Player player)
+    {
+        int index = playerIndexes[player];
+        GameObject basket = anotherBaskets[index];
+        return basket.transform;
     }
 }

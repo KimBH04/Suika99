@@ -10,7 +10,7 @@ public class FruitPool : MonoBehaviour
 
     private void Awake()
     {
-        pool = new ObjectPool<GameObject>(CreatePoolItem, TakePoolItem, ReleasePoolItem, DestroyPoolItem, true, 255);
+        pool = new ObjectPool<GameObject>(CreatePoolItem, TakePoolItem, ReleasePoolItem, collectionCheck: true, defaultCapacity: 255);
     }
 
     private GameObject CreatePoolItem()
@@ -28,10 +28,5 @@ public class FruitPool : MonoBehaviour
     private void ReleasePoolItem(GameObject item)
     {
         item.GetComponent<Fruit>().PunSetActive(false);
-    }
-
-    private void DestroyPoolItem(GameObject item)
-    {
-        Destroy(item);
     }
 }

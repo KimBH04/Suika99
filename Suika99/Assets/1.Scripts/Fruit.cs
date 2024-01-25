@@ -46,13 +46,10 @@ public class Fruit : MonoBehaviour, IPunObservable
     {
         rigid2d.constraints = RigidbodyConstraints2D.FreezeAll;
         circle.enabled = false;
-    }
 
-    private void Update()
-    {
-        if (!pv.IsMine)
+        if (pv.IsMine)
         {
-            transform.localPosition = recivePos;
+            OverArea.RemoveInstance(gameObject);
         }
     }
 
@@ -107,7 +104,7 @@ public class Fruit : MonoBehaviour, IPunObservable
             }
             else if (stream.IsReading)
             {
-                recivePos = (Vector3)stream.ReceiveNext();
+                transform.localPosition = (Vector3)stream.ReceiveNext();
             }
         }
     }
