@@ -73,6 +73,12 @@ public class PoolsManager : MonoBehaviour
     private IEnumerator DropChange()
     {
         yield return new WaitForSeconds(0.5f);
+
+        if (GameManager.IsEnd)
+        {
+            yield break;
+        }
+
         drop = next;
         drop.position = dropPoint.position;
 

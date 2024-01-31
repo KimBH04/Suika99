@@ -13,17 +13,23 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private static Room room;
 
-    [SerializeField] private GameObject[] anotherBaskets;
+    [SerializeField] private GameObject pools;
+
+    [Header("Other Player Displays")]
+    [SerializeField] private GameObject[] otherBaskets;
     [SerializeField] private GameObject[] KOPanels;
     [SerializeField] private TMP_Text[] playerNames;
 
-    [SerializeField] private GameObject startButton;
+    [Header("UI")]
     [SerializeField] private TMP_Text countDownText;
+    [SerializeField] private GameObject startButton;
 
-    [SerializeField] private GameObject pools;
+    [SerializeField] private GameObject wonPlayerPanel;
+    [SerializeField] private TMP_Text wonPlayerText;
+    [SerializeField] private TMP_Text leaveCountText;
 
-    private readonly Dictionary<Player, int> playerIndexes = new();
-    private int userIndex;
+    private readonly Dictionary<Player, int> playerIndexes = new();     //Value : Another player's basket index
+    private int userIndex;                                              //local client's index
 
     private readonly RaiseEventOptions options = new()
     {
@@ -33,6 +39,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private static bool isStart;
     private static bool isEnd;
+
+    private int remainPlayer;
 
     public static bool IsStart
     {
@@ -71,11 +79,13 @@ public class GameManager : MonoBehaviourPunCallbacks
         int playerCount = userIndex;
         for (int i = 0; i < playerCount; i++)
         {
-            anotherBaskets[i].SetActive(true);
+            otherBaskets[i].SetActive(true);
         }
-
+        
+        //각 바구니마다 본인을 제외한 플레이어 정하기
+        //Each baskets decide other players
         int index = 0;
-        foreach (var player in room.Players.OrderBy(x => x.Key).Select(x => x.Value))
+        foreach (Player player in room.Players.Values)
         {
             if (player.NickName != PhotonNetwork.NickName)
             {
@@ -114,6 +124,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             case 0:
                 IsStart = true;
                 startButton.SetActive(false);
+                remainPlayer = room.PlayerCount;
 
                 StartCoroutine(CountDown());
                 countDownText.gameObject.SetActive(true);
@@ -134,6 +145,32 @@ public class GameManager : MonoBehaviourPunCallbacks
                 if (PhotonNetwork.IsMasterClient)
                 {
                     PhotonNetwork.DestroyPlayerObjects(endedPlayer);
+                }
+
+                remainPlayer--;
+
+                if (remainPlayer == 1)
+                {
+                    Debug.Log("Game Set!");
+                    if (isEnd)
+                    {
+                        foreach (var player in playerIndexes)
+                        {
+                            if (!KOPanels[player.Value].activeSelf)
+                            {
+                                wonPlayerText.text = player.Key.NickName;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        wonPlayerText.text = PhotonNetwork.NickName;
+                    }
+                    wonPlayerText.text += " won!";
+                    wonPlayerPanel.SetActive(true);
+
+                    StartCoroutine(AutoExitRoom());
                 }
                 break;
 
@@ -159,13 +196,36 @@ public class GameManager : MonoBehaviourPunCallbacks
         pools.SetActive(true);
     }
 
+    private IEnumerator AutoExitRoom()
+    {
+        int count = 10;
+        while (count > 0)
+        {
+            leaveCountText.text = $"Leave in {count} second{(count > 1 ? 's' : string.Empty)}";
+            yield return new WaitForSeconds(1);
+            count--;
+        }
+        Exit();
+    }
+
+    public void Exit()
+    {
+        StopAllCoroutines();
+        PhotonNetwork.LeaveRoom();
+    }
+
+    public override void OnLeftRoom()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(1);
+    }
+
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         int newPlayersIndex = room.PlayerCount - 2;
         playerIndexes.Add(newPlayer, newPlayersIndex);
 
         playerNames[newPlayersIndex].text = newPlayer.NickName;
-        anotherBaskets[newPlayersIndex].SetActive(true);
+        otherBaskets[newPlayersIndex].SetActive(true);
         playerNames[newPlayersIndex].gameObject.SetActive(true);
     }
 
@@ -178,7 +238,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            anotherBaskets[room.PlayerCount - 1].SetActive(false);
+            otherBaskets[room.PlayerCount - 1].SetActive(false);
             playerNames[room.PlayerCount - 1].gameObject.SetActive(false);
 
             foreach (var player in playerIndexes.Keys.ToArray())
@@ -207,7 +267,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public Transform GetBasket(Player player)
     {
         int index = playerIndexes[player];
-        GameObject basket = anotherBaskets[index];
+        GameObject basket = otherBaskets[index];
         return basket.transform;
     }
 }

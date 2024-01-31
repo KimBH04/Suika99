@@ -15,7 +15,7 @@ public class FruitPool : MonoBehaviour
 
     private GameObject CreatePoolItem()
     {
-        GameObject poolItem = PhotonNetwork.Instantiate($"Fruits/{fruit.name}", Vector3.zero, Quaternion.identity);
+        GameObject poolItem = PhotonNetwork.Instantiate($"Fruits/{fruit.name}", new Vector3(0f, 100f, 0f), Quaternion.identity);
         poolItem.GetComponent<Fruit>().pool = pool;
         return poolItem;
     }

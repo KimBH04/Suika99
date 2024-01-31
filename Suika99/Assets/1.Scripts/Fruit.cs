@@ -14,6 +14,8 @@ public class Fruit : MonoBehaviour, IPunObservable
     private Rigidbody2D rigid2d;
     private CircleCollider2D circle;
 
+    private OverArea area;
+
     private PhotonView pv;
     private Vector3 recivePos = new(0f, 100f, 0f);
     private bool punActiveSelf;
@@ -22,6 +24,8 @@ public class Fruit : MonoBehaviour, IPunObservable
     {
         rigid2d = GetComponent<Rigidbody2D>();
         circle = GetComponent<CircleCollider2D>();
+
+        area = FindAnyObjectByType<OverArea>();
 
         pv = GetComponent<PhotonView>();
 
@@ -49,7 +53,7 @@ public class Fruit : MonoBehaviour, IPunObservable
 
         if (pv.IsMine)
         {
-            OverArea.RemoveInstance(gameObject);
+            area.RemoveInstance(gameObject);
         }
     }
 

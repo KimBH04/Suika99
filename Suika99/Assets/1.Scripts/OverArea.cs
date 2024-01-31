@@ -7,7 +7,7 @@ public class OverArea : MonoBehaviour
 {
     [SerializeField] private TMP_Text countdownText;
 
-    private static readonly HashSet<GameObject> triggeredObjects = new();
+    private readonly HashSet<GameObject> triggeredObjects = new();
     private int enterCount = 0;
     private Coroutine routine;
 
@@ -18,7 +18,6 @@ public class OverArea : MonoBehaviour
             if (enterCount == 0)
             {
                 routine = StartCoroutine(CountDown());
-                countdownText.gameObject.SetActive(true);
             }
             triggeredObjects.Add(collision.gameObject);
             enterCount++;
@@ -28,6 +27,14 @@ public class OverArea : MonoBehaviour
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.CompareTag("Fruits"))
+        {
+            RemoveInstance(collision.gameObject);
+        }
+    }
+
+    public void RemoveInstance(GameObject @object)
+    {
+        if (triggeredObjects.Remove(@object))
         {
             enterCount--;
             if (enterCount < 0)
@@ -40,23 +47,19 @@ public class OverArea : MonoBehaviour
                 StopCoroutine(routine);
                 countdownText.gameObject.SetActive(false);
             }
-            RemoveInstance(collision.gameObject);
         }
-    }
-
-    public static void RemoveInstance(GameObject @object)
-    {
-        triggeredObjects.Remove(@object);
     }
 
     private IEnumerator CountDown()
     {
-        int count = 10;
+        yield return new WaitForSeconds(1);
+        countdownText.gameObject.SetActive(true);
+
+        int count = 9;
         while (count > 0)
         {
-            countdownText.text = count.ToString();
+            countdownText.text = count--.ToString();
             yield return new WaitForSeconds(1);
-            count--;
         }
         GameManager.IsEnd = true;
         enabled = false;
