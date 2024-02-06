@@ -8,6 +8,8 @@ using UnityEngine.UI;
 
 public class PlayFabManager : MonoBehaviour
 {
+    public static string userName;
+
     [SerializeField] private GameObject accountPanel;
 
     [Header("Login")]
@@ -61,6 +63,15 @@ public class PlayFabManager : MonoBehaviour
         PlayFabClientAPI.LoginWithEmailAddress(request, OnLoginSuccess, OnLoginFailure);
     }
 
+    public void Logout()
+    {
+        PlayerPrefs.DeleteKey("email");
+        PlayerPrefs.DeleteKey("password");
+
+        accountPanel.SetActive(true);
+        loginPanel.SetActive(true);
+    }
+
     public void Register()
     {
         if (registerPasswordInput.text == registerRepeatPasswordInput.text)
@@ -76,7 +87,7 @@ public class PlayFabManager : MonoBehaviour
         }
         else
         {
-
+            registerErrorText.text = "Password don't match";
         }
     }
 
@@ -86,35 +97,55 @@ public class PlayFabManager : MonoBehaviour
         if (loginRemember.isOn)
         {
             PlayerPrefs.SetString("email", loginEmailInput.text);
+            PlayerPrefs.SetString("password", loginPasswordInput.text);
         }
 
-        accountPanel.SetActive(false);
-        loginPanel.SetActive(false);
+        GetAccountInfoRequest request = new()
+        {
+            Email = loginEmailInput.text
+        };
+
+        PlayFabClientAPI.GetAccountInfo(request,
+            result =>
+            {
+                userName = result.AccountInfo.Username;
+                Debug.Log(userName);
+
+                accountPanel.SetActive(false);
+                loginPanel.SetActive(false);
+                registerPanel.SetActive(false);
+            },
+            error =>
+            {
+                loginErrorText.text = error.ErrorMessage;
+            });
     }
 
     private void OnLoginFailure(PlayFabError error)
     {
         Debug.Log("Login fail");
-        loginErrorText.text = error.GenerateErrorReport();
+        loginErrorText.text = error.ErrorMessage;
+
+        accountPanel.SetActive(true);
+        loginPanel.SetActive(true);
+        registerPanel.SetActive(false);
     }
 
     private void OnRegisterSuccess(RegisterPlayFabUserResult result)
     {
         Debug.Log("Regist success");
-        LoginWithEmailAddressRequest request = new()
-        {
-            Email = registerEmailInput.text,
-            Password = registerPasswordInput.text,
-        };
 
-        PlayFabClientAPI.LoginWithEmailAddress(request, OnLoginSuccess, OnLoginFailure);
-        accountPanel.SetActive(false);
+        loginPanel.SetActive(true);
         registerPanel.SetActive(false);
     }
 
     private void OnRegisterFailure(PlayFabError error)
     {
         Debug.Log("Regist fail");
-        registerErrorText.text = error.GenerateErrorReport();
+        registerErrorText.text = error.ErrorMessage;
+
+        accountPanel.SetActive(true);
+        loginPanel.SetActive(false);
+        registerPanel.SetActive(true);
     }
 }
